@@ -382,7 +382,7 @@ KDC 는 모두 하나의 물리 장비에 있기 때문에, (종종 하나의 �
     TGS\_REQ = ( Principal_{Service} , Lifetime,  Authenticator ) { TGT }K_{TGS}
 
 
-4.4 Ticket Granting Server Replay(TGS_REP)
+4.4 Ticket Granting Server Replay (TGS_REP)
 ==================================================
 
 이전 요청이 도착하면 TGS 는 먼저 요청한 서비스의 principal(:math:`Principal_{Service}`) 가 KDC 데이터베이스에 존재하는지를 확인합니다.: 존재한다면, krbtgt/REALM@REALM 의 키로 TGT 을 열고 세션 키를(:math:`SK_{TGS}`) 추출한 다음 인증자를 복호화하는데 씁니다. 발행될 서비스 티켓에 대해서 다음 조건들을 충족하는지 확인합니다.
