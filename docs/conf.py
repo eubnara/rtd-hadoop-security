@@ -17,7 +17,7 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'Nimf study'
+project = 'Hadoop Security'
 copyright = '2020, Yubi Lee'
 author = 'Yubi Lee'
 
