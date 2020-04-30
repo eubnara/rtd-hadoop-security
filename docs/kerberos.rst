@@ -356,7 +356,7 @@ KDC 는 모두 하나의 물리 장비에 있기 때문에, (종종 하나의 �
 
 .. math::
 
-    AS\_REP = \{ Principal_{Service} , Timestamp , Lifetime , SK_{TGS} \}K_{User}  \{ TGT \}K_{TGS}
+    AS\_REP = \{ Principal_{Service} , Timestamp , Lifetime , SK_{TGS} \}K_{User}\ \ \{ TGT \}K_{TGS}
 
 이 메시지에 불필요한 정보가 포함된 것처럼 보일 수 있습니다. (:math:`Principal_{Service}`, timestamp, lifetime 그리고 세션 키) 그러나 아닙니다.: TGT 안에 포함된 정보들은 서버의 암호 키로 암호화되었기 떄문에 클라이언트가 읽을 수 없고 반복되어야 합니다. 여기서 클라이언트가 응답 메시지를 받았을 때 사용자에게 암호를 입력하라고 요청합니다. salt 가 비밀번호에 붙여지고 ``string2key`` 함수가 적용됩니다.: 이 키로 KDC 에 의해 데이터베이스에 저장된 사용자의 암호 키로 암호화된 메시지의 일부분을 복호화하는 시도를 합니다. 사용자가 정말 맞다면, 즉 정확한 암호를 입력했다면, 복호화 과정은 성공하고 세션 키를 추출하고 TGT (암호화된 상태 그대로) 와 함께 사용자의 credential cache 에 저장됩니다.
 
@@ -372,14 +372,14 @@ KDC 는 모두 하나의 물리 장비에 있기 때문에, (종종 하나의 �
 
 .. math::
 
-    Authenticator = { Principal_{Client}, Timestamp } SK_{TGS}
+    Authenticator = \{\ Principal_{Client}\ ,\ Timestamp\ \}SK_{TGS}
 
 - 다음을 포함하는 요청 패킷을 만듭니다.: 필요로 하는 티켓에 대한 서비스 principal 과 복호화된 lifetime; TGS 의 키로 이미 암호화된 Ticket Grating Ticket; 그리고 방금 만든 인증자.
 요약하면:
 
 .. math::
 
-    TGS\_REQ = ( Principal_{Service} , Lifetime,  Authenticator ) { TGT }K_{TGS}
+    TGS\_REQ = ( Principal_{Service} , Lifetime,  Authenticator )\ \{\ TGT\ \}K_{TGS}
 
 
 4.4 Ticket Granting Server Replay (TGS_REP)
@@ -403,9 +403,11 @@ KDC 는 모두 하나의 물리 장비에 있기 때문에, (종종 하나의 �
 
 - 다음을 포함하는 응답을 보낸다.: 서비스 비밀 키(:math:`K_{Service}` 라 부르자.) 로 암호화한 방금 생성한 티켓; TGT 에서 추출한 세션 키를 사용하여 모두 암호화된 서비스 principal, timestamp, lifetime 그리고 새로운 세션 키. 요약하면 다음과 같다.
 
+
 .. math::
 
-    TGS\_REP = { Principal_{Service} , Timestamp , Lifetime , SK_{Service} } SK_{TGS} { T_{Service} } K_{Service}
+    TGS\_REP = \{ Principal_{Service} , Timestamp , Lifetime , SK_{Service} \} SK_{TGS}\ \ \{ T_{Service} \} K_{Service}
+
 
 
 ..
