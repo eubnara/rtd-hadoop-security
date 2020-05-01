@@ -446,3 +446,32 @@ KDC 는 모두 하나의 물리 장비에 있기 때문에, (종종 하나의 �
 
 | Authentication Server Reply (AS_REP) 의 설명에서 보았던 것처럼, 티켓을 배분하기 전에 KDC 는 간단히 요청자와 서비스 제공자의 principal 이 데이터베이스에 존재하는지 확인합니다. TGT 에 대한 요청이었다면 더 쉽습니다. 왜냐하면 krbtgt/REALM@REALM 은 확실히 존재하기에, 단순한 초기 인증 요청으로 TGT 를 얻기 위해 사용자의 principal 이 존재하는지만 확인하는 것으로 충분합니다. 확실히 합법적이지 않은 사용자로부터 요청이 왔다면 TGT 는 사용될 수 없습니다. 그들은 암호를 모르기 때문에 유효한 인증자를 만들기 위한 세션 키를 얻을 수 없습니다. 그러나 쉽게 얻어진 이 티켓은 의도한 서비스의 장기간의 키를 추측하기 위한 시도로 무차별 대입 공격(brute-force attack) 을 겪을 수 있습니다. 분명 서비스의 비밀을 추측하는 것은 현재 연산처리 능력으로도 쉬운 일은 아닙니다. 하지만 Kerberos 5 에서 사전 인증(pre-authentication) 개념이 보안을 강화하기 위해 등장했습니다. 만일 KDC 의 정책이 (설정 가능) 초기 클라이언트 요청에 대해 사전 인증을 요청한다면, 인증 서버는 사전 인증이 필요하다는 에러 패킷으로 응답합니다. 클라이언트는 오류에 따라 사용자에게 암호 입력을 요청하고 요청을 재제출합니다. 그런데 이때 사용자의 장기 키로 암호화한 timestamp 를 더합니다. 장기 키는 알다시피 암호화되지 않은 비밀번호에 salt 가 있다면 더한 뒤 ``string2key`` 를 적용하여 얻어진 것입니다. 이번엔 KDC 는 사용자의 암호를 알기에 요청에 존재하는 timestamp 를 복호화 해봅니다. 이것이 성공하고 timestamp 가 기준 안에 들어왔다면, (설정된 허용오차 내), 요청한 사용자가 진짜고 인증 절차는 정상적으로 진행됩니다.
 | 사전 인증은 KDC 정책이라는 점이고 프로토콜은 이걸 꼭 필요로 하는 것은 아니라는 점에 주목해야 합니다. 구현 관점에서 MIT Kerberos 5 와 Heimdal 은 기본적으로 사전인증이 비활성화 되어있습니다. 그러나 Windows Active Directory 와 AFS kaserver (pre-authenticated Kerberos 4) 의 Kerberos 는 사전 인증을 요청합니다.
+
+
+---------------------------------
+5. 티켓 심층 이해
+---------------------------------
+
+5.1 초기 티켓
+===================
+
+(사용자들은 비밀번호 입력으로 인증해야 할 때) 초기 티켓은 AS 로부터 직접 얻어 옵니다. 여기서 TGT 는 항상 초기 티켓이라는 점을 추론할 수 있습니다. 반면 서비스 티켓은 TGT 를 제출하는 것으로 TGS 로부터 배분됩니다. 따라서 초기 티켓이 아닙니다. 그러나 이 규칙에 예외가 있습니다.: 바로 몇초 전에 사용자가 비밀번호를 입력했다는 것을 보장하기 위해서 몇몇 Kerberos 애플리케이션은 서비스 티켓이 초기 티켓일 것을 요구합니다.; 이러한 경우에 티켓은 비록 TGT 가 아니지만 TGS 대신 AS 로부터 요청되고 초기 티켓이 됩니다. 운영 관점에서 pippo 라는 사용자가 mbox.example.com 장비에 있는 imap 서비스에 대한 초기 티켓을 얻고자 할 때 (즉, TGT 사용을 하지 않고) 다음 명령어를 사용합니다.:
+
+::
+
+    [pippo@client01 pippo]$ kinit -S imap/mbox.example.com@EXAMPLE.COM pippo@EXAMPLE.COM
+    Password for pippo@EXAMPLE.COM:
+    [pippo@client01 pippo]$
+    [pippo@client01 pippo]$ klist -f
+    Ticket cache: FILE:/tmp/krb5cc_500
+    Default principal: pippo@EXAMPLE.COM
+
+    Valid starting     Expires            Service principal
+    01/27/05 14:28:59  01/28/05 14:28:39  imap/mbox.example.com@EXAMPLE.COM
+            Flags: I
+
+    Kerberos 4 ticket cache: /tmp/tkt500
+    klist: You have no tickets cached
+
+``I`` 플래그가 존재한다는 점에 유의합니다. 이는 초기 티켓을 나타냅니다.
+
