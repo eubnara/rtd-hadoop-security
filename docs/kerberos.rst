@@ -2,12 +2,11 @@
 The Kerberos Protocol And Its Implementations
 ======================================================
 
-**TBD**
 
 - http://www.kerberos.org/software/tutorial.html
 - https://zeroshell.org/kerberos/Kerberos-definitions/
 
-위 문서를 번역 중입니다.
+위 문서를 번역하였습니다.
 
 -----
 목차
